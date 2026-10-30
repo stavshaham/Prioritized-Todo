@@ -36,14 +36,15 @@ def add_task(name, priority):
         Overall complexity: O(n log n)
     """
 
+    # Give the task a unique order number.
+    order = next(task_counter)
+
     task = {
         "name": name,
         "priority": priority,
+        "order": order, 
         "done": False
     }
-
-    # Give the task a unique order number.
-    order = next(task_counter)
 
     # Add the task to the heap.
     # heappush() places the item at the end and heapify
@@ -111,6 +112,75 @@ def mark_done(task, completed):
 
     # Dictionary access and modification take constant time.
     task["done"] = completed
+    save_tasks()
+
+def move_up_priority(task):
+    """
+    Change a task's priority to one above it.
+    
+    Time complexity:
+        Removing the item takes O(n).
+
+        Appending takes O(1).
+
+        Heapify takes O(n).
+
+        Overall complexity: O(n)
+    """
+    # Skip if task is already the highest.
+    if task["priority"] == 1:
+        return
+
+    # Remove the task from the queue.
+    task_queue.remove((task["priority"], task["order"], task))
+
+    # Give the task higher priority.
+    task["priority"] -= 1
+
+    # Give the task a unique order number.
+    task["order"] = next(task_counter)
+
+    # Add the task to the queue.
+    task_queue.append((task["priority"], task["order"], task))
+
+    # heapify() is O(n)
+    heapq.heapify(task_queue)
+
+    save_tasks()
+
+def move_down_priority(task):
+    """
+        Change a task's priority to one below it.
+        
+        Time complexity:
+            Removing the item takes O(n).
+    
+            Appending takes O(1).
+    
+            Heapify takes O(n).
+    
+            Overall complexity: O(n)
+    """
+
+    # Skip if task is already the lowest.
+    if task["priority"] == 3:
+        return
+
+    # Remove the task from the queue.
+    task_queue.remove((task["priority"], task["order"], task))
+
+    # Give the task lower priority.
+    task["priority"] += 1
+
+    # Give the task a unique order number.
+    task["order"] = next(task_counter)
+
+    # Add the task to the queue.
+    task_queue.append((task["priority"], task["order"], task))
+
+    # heapify() is O(n)
+    heapq.heapify(task_queue)
+
     save_tasks()
 
 
@@ -193,12 +263,13 @@ def load_data_from_file():
 
     # Add every saved task to a regular list.
     for task in data:
+        # Give the task a unique order number.
+        order = next(task_counter)
+
         # Give old tasks default values.
         task.setdefault("priority", 2)
         task.setdefault("done", False)
-
-        # Give the task a unique order number.
-        order = next(task_counter)
+        task["order"] = order
 
         # Add the tuple to the list.
         task_queue.append(

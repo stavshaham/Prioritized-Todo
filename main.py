@@ -112,6 +112,56 @@ def remove_task():
     update_tasks()
 
 
+def move_up_priority(task):
+    """
+    Change a task's priority to one above it.
+    
+    Time complexity:
+        Removing the item takes O(n).
+        
+        Appending takes O(1).
+        
+        Heapify takes O(n).
+        
+        Overall complexity: O(n)
+    """
+
+    # Return early if the task is already at the highest priority.
+    if task["priority"] == 1:
+        return
+    
+    # Move up the task's priority.
+    ts.move_up_priority(task)
+
+    # Refresh the displayed tasks.
+    update_tasks()
+
+
+def move_down_priority(task):
+    """
+    Change a task's priority to one below it.
+    
+    Time complexity:
+        Removing the item takes O(n).
+        
+        Appending takes O(1).
+        
+        Heapify takes O(n).
+        
+        Overall complexity: O(n)
+    """
+    
+    # Return early if the task is already at the lowest priority.
+    if task["priority"] == 3:
+        return
+    
+    # Move down the task's priority.
+    ts.move_down_priority(task)
+
+    # Refresh the displayed tasks.
+    update_tasks()
+
+
 def update_tasks():
     """
     Display all tasks in priority order.
@@ -156,9 +206,63 @@ def update_tasks():
             + task["name"]
         )
 
+        # Create a frame for the widgets
+        frame = tk.Frame(
+            root.checkbox_frame
+        )
+
+        # Add the frame to the window.
+        frame.pack(
+            anchor='w'
+        )
+
+        # Create a move up button for the task.
+        move_up_button = ttk.Button(
+            frame,
+            text="+P",
+            width=2
+        )
+        
+        # Add the move up button to the frame.
+        move_up_button.pack(
+            anchor="w",
+            side="left"
+        )
+
+        # Connect this move up button to the on_toggle() function.
+        # The default values in the lambda remember which task, variable, and checkbox belong together.
+        move_up_button.config(
+            command=lambda task_object=task:
+            move_up_priority(
+                task_object
+            )
+        )
+
+        # Create a move down button for the task.
+        move_down_button = ttk.Button(
+            frame,
+            text="-P",
+            width=2
+        )
+                
+        # Add the move down button to the frame.
+        move_down_button.pack(
+            anchor="w",
+            side="left"
+        )
+
+        # Connect this move up button to the on_toggle() function.
+        # The default values in the lambda remember which task, variable, and checkbox belong together.
+        move_down_button.config(
+            command=lambda task_object=task:
+            move_down_priority(
+                task_object
+            )
+        )
+
         # Create a checkbox for the task.
         checkbox = tk.Checkbutton(
-            root.checkbox_frame,
+            frame,
             text=displayed_text,
             variable=task_variable,
             bg="#1e1e1e",
@@ -170,7 +274,8 @@ def update_tasks():
         # Add the checkbox to the window.
         checkbox.pack(
             anchor="w",
-            pady=3
+            pady=3,
+            side="left"
         )
 
         # Apply the correct style.
